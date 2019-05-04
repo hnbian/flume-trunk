@@ -39,6 +39,12 @@ public class EventHelper {
     return dumpEvent(event, DEFAULT_MAX_BYTES);
   }
 
+  /**
+   * 对事件进行处理
+   * @param event
+   * @param maxBytes
+   * @return
+   */
   public static String dumpEvent(Event event, int maxBytes) {
     StringBuilder buffer = new StringBuilder();
     if (event == null || event.getBody() == null) {

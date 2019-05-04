@@ -88,6 +88,7 @@ public interface LifecycleAware {
   /**
    * <p>
    * Starts a service or component.
+   * 启动服务
    * </p>
    * <p>
    * Implementations should determine the result of any start logic and effect
@@ -102,6 +103,7 @@ public interface LifecycleAware {
   /**
    * <p>
    * Stops a service or component.
+   * 停止服务
    * </p>
    * <p>
    * Implementations should determine the result of any stop logic and effect
@@ -116,6 +118,7 @@ public interface LifecycleAware {
   /**
    * <p>
    * Return the current state of the service or component.
+   * 获取生命周期状态
    * </p>
    */
   public LifecycleState getLifecycleState();

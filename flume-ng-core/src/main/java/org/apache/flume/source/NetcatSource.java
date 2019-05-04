@@ -150,6 +150,9 @@ public class NetcatSource extends AbstractSource implements Configurable,
   }
 
   @Override
+  /**
+   * 启动 source
+   */
   public void start() {
 
     logger.info("Source starting");
@@ -157,10 +160,12 @@ public class NetcatSource extends AbstractSource implements Configurable,
     counterGroup.incrementAndGet("open.attempts");
 
     try {
+      //套接字
       SocketAddress bindPoint = new InetSocketAddress(hostName, port);
-
+      //打开一个套接字通道 NIO
       serverSocket = ServerSocketChannel.open();
       serverSocket.socket().setReuseAddress(true);
+      //绑定端口
       serverSocket.socket().bind(bindPoint);
 
       logger.info("Created serverSocket:{}", serverSocket);
@@ -171,9 +176,11 @@ public class NetcatSource extends AbstractSource implements Configurable,
       throw new FlumeException(e);
     }
 
+    //创建一个缓存线程池服务
     handlerService = Executors.newCachedThreadPool(new ThreadFactoryBuilder()
         .setNameFormat("netcat-handler-%d").build());
 
+    //接收处理器
     AcceptHandler acceptRunnable = new AcceptHandler(maxLineLength);
     acceptThreadShouldStop.set(false);
     acceptRunnable.counterGroup = counterGroup;
@@ -181,11 +188,14 @@ public class NetcatSource extends AbstractSource implements Configurable,
     acceptRunnable.shouldStop = acceptThreadShouldStop;
     acceptRunnable.ackEveryEvent = ackEveryEvent;
     acceptRunnable.source = this;
+    //把创建的套接字处理器交给接收处理器 serverSocketChannel
     acceptRunnable.serverSocket = serverSocket;
     acceptRunnable.sourceEncoding = sourceEncoding;
 
+    //启动线程接收客户端发送的套接字连接
     acceptThread = new Thread(acceptRunnable);
 
+    //启动线程
     acceptThread.start();
 
     logger.debug("Source started");
@@ -250,8 +260,10 @@ public class NetcatSource extends AbstractSource implements Configurable,
     super.stop();
   }
 
+  //继承Runnable 接口
   private static class AcceptHandler implements Runnable {
 
+    //接收套接字通道
     private ServerSocketChannel serverSocket;
     private CounterGroup counterGroup;
     private ExecutorService handlerService;
@@ -270,10 +282,12 @@ public class NetcatSource extends AbstractSource implements Configurable,
     public void run() {
       logger.debug("Starting accept handler");
 
-      while (!shouldStop.get()) {
+      while (!shouldStop.get()) {//循环
         try {
+          //接收套接字
           SocketChannel socketChannel = serverSocket.accept();
 
+          //创建一个新的套接字处理器
           NetcatSocketHandler request = new NetcatSocketHandler(maxLineLength);
 
           request.socketChannel = socketChannel;
@@ -282,6 +296,7 @@ public class NetcatSource extends AbstractSource implements Configurable,
           request.ackEveryEvent = ackEveryEvent;
           request.sourceEncoding = sourceEncoding;
 
+          //提交请求到队列中供以后被线程调用进行访问
           handlerService.submit(request);
 
           counterGroup.incrementAndGet("accept.succeeded");
@@ -297,6 +312,9 @@ public class NetcatSource extends AbstractSource implements Configurable,
     }
   }
 
+  /**
+   * 套接字处理器，主要目的将消息转换为事件对象
+   */
   private static class NetcatSocketHandler implements Runnable {
 
     private Source source;
@@ -317,9 +335,13 @@ public class NetcatSource extends AbstractSource implements Configurable,
       Event event = null;
 
       try {
+        //
         Reader reader = Channels.newReader(socketChannel, sourceEncoding);
+        //
         Writer writer = Channels.newWriter(socketChannel, sourceEncoding);
+        //字符缓冲区
         CharBuffer buffer = CharBuffer.allocate(maxLineLength);
+
         buffer.flip(); // flip() so fill() sees buffer as initially empty
 
         while (true) {
@@ -328,6 +350,7 @@ public class NetcatSource extends AbstractSource implements Configurable,
           logger.debug("Chars read = {}", charsRead);
 
           // attempt to process all the events in the buffer
+          //处理事件
           int eventsProcessed = processEvents(buffer, writer);
           logger.debug("Events processed = {}", eventsProcessed);
 
@@ -391,7 +414,7 @@ public class NetcatSource extends AbstractSource implements Configurable,
 
         int limit = buffer.limit();
         for (int pos = buffer.position(); pos < limit; pos++) {
-          if (buffer.get(pos) == '\n') {
+          if (buffer.get(pos) == '\n') { // 去读一行数据
 
             // parse event body bytes out of CharBuffer
             buffer.limit(pos); // temporary limit
@@ -401,11 +424,13 @@ public class NetcatSource extends AbstractSource implements Configurable,
             // build event object
             byte[] body = new byte[bytes.remaining()];
             bytes.get(body);
+            //通过消息body构建一个对象
             Event event = EventBuilder.withBody(body);
 
             // process event
             ChannelException ex = null;
             try {
+              // 处理事件
               source.getChannelProcessor().processEvent(event);
             } catch (ChannelException chEx) {
               ex = chEx;

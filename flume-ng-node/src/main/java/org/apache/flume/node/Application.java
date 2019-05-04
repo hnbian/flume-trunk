@@ -55,6 +55,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
+//flume agent 应用入口点程序
 public class Application {
 
   private static final Logger logger = LoggerFactory

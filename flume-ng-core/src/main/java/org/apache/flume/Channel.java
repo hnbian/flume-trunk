@@ -22,11 +22,13 @@ import org.apache.flume.annotations.InterfaceStability;
 import org.apache.flume.lifecycle.LifecycleAware;
 
 /**
+ * 通道连接 source 和 sink ， source扮演着事件的生产者角色，sink扮演着事件消费者角色，channel作为一个桥梁连接二者。
  * <p>
  * A channel connects a {@link Source} to a {@link Sink}. The source
  * acts as producer while the sink acts as a consumer of events. The channel
  * itself is the buffer between the two.
  * </p>
+ * 通道暴露了一个事务性的接口，能够保证事物的原子性（put,take）
  * <p>
  * A channel exposes a {@link Transaction} interface that can be used by
  * its clients to ensure atomic {@linkplain #put(Event) put} and
@@ -40,10 +42,12 @@ import org.apache.flume.lifecycle.LifecycleAware;
  * ranging from strong to best-effort semantics.
  * </p>
  * <p>
+ *     通道和唯一的命名组件关联，也可以单独配置名称
  * Channels are associated with unique {@linkplain NamedComponent names} that
  * can be used for separating configuration and working namespaces.
  * </p>
  * <p>
+ *     通道必须是线程安全的，
  * Channels must be thread safe, protecting any internal invariants as no
  * guarantees are given as to when and by how many sources/sinks they may
  * be simultaneously accessed by.
@@ -58,6 +62,7 @@ import org.apache.flume.lifecycle.LifecycleAware;
 public interface Channel extends LifecycleAware, NamedComponent {
 
   /**
+   * 把事件放进通道
    * <p>Puts the given event into the channel.</p>
    * <p><strong>Note</strong>: This method must be invoked within an active
    * {@link Transaction} boundary. Failure to do so can lead to unpredictable
@@ -69,6 +74,8 @@ public interface Channel extends LifecycleAware, NamedComponent {
   public void put(Event event) throws ChannelException;
 
   /**
+   * 如果通道是可用的，从通道中返回下一个事件。
+   * 如果通道是不可用的那么这个方法必须返回null
    * <p>Returns the next event from the channel if available. If the channel
    * does not have any events available, this method must return {@code null}.
    * </p>
@@ -83,6 +90,7 @@ public interface Channel extends LifecycleAware, NamedComponent {
   public Event take() throws ChannelException;
 
   /**
+   * 获取事物实例
    * @return the transaction instance associated with this channel.
    */
   public Transaction getTransaction();

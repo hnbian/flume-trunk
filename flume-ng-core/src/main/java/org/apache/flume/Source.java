@@ -25,17 +25,18 @@ import org.apache.flume.channel.ChannelProcessor;
 import org.apache.flume.lifecycle.LifecycleAware;
 
 /**
+ * Source 生成事件对象，调用通道处理器方法，将事件持久化到配置的通道中。
  * <p>
  * A source generates {@plainlink Event events} and calls methods on the
  * configured {@link ChannelProcessor} to persist those events into the
  * configured {@linkplain Channel channels}.
  * </p>
- *
+ * Source命名组件关联在一起，可以使用单独的配置和网络名称
  * <p>
  * Sources are associated with unique {@linkplain NamedComponent names} that can
  * be used for separating configuration and working namespaces.
  * </p>
- *
+ * 不保证线程安全
  * <p>
  * No guarantees are given regarding thread safe access.
  * </p>

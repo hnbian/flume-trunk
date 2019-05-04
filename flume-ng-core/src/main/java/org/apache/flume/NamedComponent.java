@@ -29,8 +29,16 @@ import org.apache.flume.annotations.InterfaceStability;
 @InterfaceStability.Stable
 public interface NamedComponent {
 
+  /**
+   * 设置名称
+   * @param name
+   */
   public void setName(String name);
 
+  /**
+   * 获取名称
+   * @return
+   */
   public String getName();
 
 }

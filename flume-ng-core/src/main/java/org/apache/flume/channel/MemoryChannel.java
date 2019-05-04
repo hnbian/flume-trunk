@@ -38,11 +38,14 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 内存通道
+ * 在考虑速度而不考虑持久性时推荐的通道
  * <p>
  * MemoryChannel is the recommended channel to use when speeds which
  * writing to disk is impractical is required or durability of data is not
  * required.
  * </p>
+ * 在做单元测试时推荐使用的通道，但可能出现数据丢失情况
  * <p>
  * Additionally, MemoryChannel should be used when a channel is required for
  * unit testing purposes.
@@ -76,11 +79,12 @@ public class MemoryChannel extends BasicChannelSemantics implements TransactionC
     }
 
     @Override
+    //存入数据
     protected void doPut(Event event) throws InterruptedException {
-      channelCounter.incrementEventPutAttemptCount();
+      channelCounter.incrementEventPutAttemptCount();//计数器
       int eventByteSize = (int) Math.ceil(estimateEventSize(event) / byteCapacitySlotSize);
 
-      if (!putList.offer(event)) {
+      if (!putList.offer(event)) {//判断获取事件是否超出队列
         throw new ChannelException(
             "Put queue for MemoryTransaction of capacity " +
             putList.size() + " full, consider committing more frequently, " +
@@ -90,6 +94,7 @@ public class MemoryChannel extends BasicChannelSemantics implements TransactionC
     }
 
     @Override
+    //提取事件
     protected Event doTake() throws InterruptedException {
       channelCounter.incrementEventTakeAttemptCount();
       if (takeList.remainingCapacity() == 0) {
@@ -102,11 +107,12 @@ public class MemoryChannel extends BasicChannelSemantics implements TransactionC
       }
       Event event;
       synchronized (queueLock) {
-        event = queue.poll();
+        event = queue.poll();//提取事件
       }
+      //检测事件是否为空
       Preconditions.checkNotNull(event, "Queue.poll returned NULL despite semaphore " +
           "signalling existence of entry");
-      takeList.put(event);
+      takeList.put(event);//将事件放进集合
 
       int eventByteSize = (int) Math.ceil(estimateEventSize(event) / byteCapacitySlotSize);
       takeByteCounter += eventByteSize;
@@ -115,6 +121,7 @@ public class MemoryChannel extends BasicChannelSemantics implements TransactionC
     }
 
     @Override
+    //事物提交
     protected void doCommit() throws InterruptedException {
       int remainingChange = takeList.size() - putList.size();
       if (remainingChange < 0) {
@@ -130,6 +137,7 @@ public class MemoryChannel extends BasicChannelSemantics implements TransactionC
               " Sinks are likely not keeping up with sources, or the buffer size is too tight");
         }
       }
+
       int puts = putList.size();
       int takes = takeList.size();
       synchronized (queueLock) {
@@ -162,6 +170,7 @@ public class MemoryChannel extends BasicChannelSemantics implements TransactionC
     }
 
     @Override
+    //事物回滚
     protected void doRollback() {
       int takes = takeList.size();
       synchronized (queueLock) {

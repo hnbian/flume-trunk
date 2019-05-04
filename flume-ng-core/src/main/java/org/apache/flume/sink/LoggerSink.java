@@ -88,10 +88,12 @@ public class LoggerSink extends AbstractSink implements Configurable {
 
     try {
       transaction.begin();
+      // 从通道中获取事件
       event = channel.take();
 
       if (event != null) {
         if (logger.isInfoEnabled()) {
+          //对事件进行处理，这里将事件打印到logger
           logger.info("Event: " + EventHelper.dumpEvent(event, maxBytesToLog));
         }
       } else {

@@ -252,24 +252,26 @@ public class ChannelProcessor implements Configurable {
    */
   public void processEvent(Event event) {
 
+    // 拦截器链对数据进行处理
     event = interceptorChain.intercept(event);
     if (event == null) {
       return;
     }
 
     // Process required channels
+    // 处理必须的通道集合
     List<Channel> requiredChannels = selector.getRequiredChannels(event);
-    for (Channel reqChannel : requiredChannels) {
-      Transaction tx = reqChannel.getTransaction();
+    for (Channel reqChannel : requiredChannels) {//遍历通道
+      Transaction tx = reqChannel.getTransaction(); //创建事物
       Preconditions.checkNotNull(tx, "Transaction object must not be null");
       try {
-        tx.begin();
-
+        tx.begin();//开启事物
+        //将event放进通道
         reqChannel.put(event);
 
-        tx.commit();
+        tx.commit(); // 提交事物
       } catch (Throwable t) {
-        tx.rollback();
+        tx.rollback();// 出现异常回滚
         if (t instanceof Error) {
           LOG.error("Error while writing to required channel: " + reqChannel, t);
           throw (Error) t;
@@ -281,12 +283,13 @@ public class ChannelProcessor implements Configurable {
         }
       } finally {
         if (tx != null) {
-          tx.close();
+          tx.close(); // 关闭事物
         }
       }
     }
 
     // Process optional channels
+    // 可选通道
     List<Channel> optionalChannels = selector.getOptionalChannels(event);
     for (Channel optChannel : optionalChannels) {
       Transaction tx = null;

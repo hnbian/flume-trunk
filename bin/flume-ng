@@ -22,10 +22,12 @@
 ################################
 # constants
 ################################
-
+#入口点程序
 FLUME_AGENT_CLASS="org.apache.flume.node.Application"
 FLUME_AVRO_CLIENT_CLASS="org.apache.flume.client.avro.AvroCLIClient"
+#获取版本
 FLUME_VERSION_CLASS="org.apache.flume.tools.VersionInfo"
+#工具类
 FLUME_TOOLS_CLASS="org.apache.flume.tools.FlumeToolsMain"
 
 CLEAN_FLAG=1
