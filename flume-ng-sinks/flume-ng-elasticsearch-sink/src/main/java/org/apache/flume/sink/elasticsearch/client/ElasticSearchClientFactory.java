@@ -22,8 +22,10 @@ import org.apache.flume.sink.elasticsearch.ElasticSearchEventSerializer;
 import org.apache.flume.sink.elasticsearch.ElasticSearchIndexRequestBuilderFactory;
 
 /**
- * Internal ElasticSearch client factory. Responsible for creating instance
- * of ElasticSearch clients.
+ * Internal ElasticSearch client factory.
+ * ElasticSearch 内部工厂
+ * Responsible for creating instance of ElasticSearch clients.
+ * 负责创建ElasticSearch客户端的实例
  */
 public class ElasticSearchClientFactory {
   public static final String TransportClient = "transport";
