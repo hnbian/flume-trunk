@@ -29,6 +29,7 @@ import org.apache.flume.sink.elasticsearch.ElasticSearchIndexRequestBuilderFacto
  */
 public class ElasticSearchClientFactory {
   public static final String TransportClient = "transport";
+  public static final String JsonTransportClient = "jsonTransport";
   public static final String RestClient = "rest";
 
   /**
@@ -48,7 +49,9 @@ public class ElasticSearchClientFactory {
       ElasticSearchIndexRequestBuilderFactory indexBuilder) throws NoSuchClientTypeException {
     if (clientType.equalsIgnoreCase(TransportClient) && serializer != null) {
       return new ElasticSearchTransportClient(hostNames, clusterName, serializer);
-    } else if (clientType.equalsIgnoreCase(TransportClient) && indexBuilder != null) { 
+    } else if (clientType.equalsIgnoreCase(JsonTransportClient) && serializer != null) {
+        return new ElasticSearchJsonTransportClient(hostNames, clusterName, indexBuilder);
+    } else if (clientType.equalsIgnoreCase(TransportClient) && indexBuilder != null) {
       return new ElasticSearchTransportClient(hostNames, clusterName, indexBuilder);
     } else if (clientType.equalsIgnoreCase(RestClient) && serializer != null) {
       return new ElasticSearchRestClient(hostNames, serializer);
@@ -58,7 +61,7 @@ public class ElasticSearchClientFactory {
 
   /**
    * Used for tests only. Creates local elasticsearch instance client.
-   *
+   * 仅用作测试，创建一个本地es客户端实例
    * @param clientType Name of client to use
    * @param serializer Serializer for the event
    * @param indexBuilder Index builder factory
