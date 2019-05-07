@@ -89,7 +89,7 @@ public class ElasticSearchSink extends AbstractSink implements Configurable, Bat
   private static final Logger logger = LoggerFactory
       .getLogger(ElasticSearchSink.class);
 
-  // Used for testing
+  // 用于测试
   private boolean isLocal = false;
   private final CounterGroup counterGroup = new CounterGroup();
 
@@ -116,8 +116,8 @@ public class ElasticSearchSink extends AbstractSink implements Configurable, Bat
   private SinkCounter sinkCounter;
 
   /**
-   * Create an {@link ElasticSearchSink} configured using the supplied
-   * configuration
+   * Create an {@link ElasticSearchSink} configured using the supplied configuration
+   *
    */
   public ElasticSearchSink() {
     this(false);
@@ -130,6 +130,7 @@ public class ElasticSearchSink extends AbstractSink implements Configurable, Bat
    *          If <tt>true</tt> sink will be configured to only talk to an
    *          ElasticSearch instance hosted in the same JVM, should always be
    *          false is production
+   * 如果为 true 那么sink只与同一JVM 中的ElasticSearch 通信，在生产环境中为false
    * 
    */
   @VisibleForTesting
@@ -177,7 +178,11 @@ public class ElasticSearchSink extends AbstractSink implements Configurable, Bat
     return batchSize;
   }
 
+
   @Override
+  /**
+   * 处理数据
+   */
   public Status process() throws EventDeliveryException {
     logger.debug("processing...");
     Status status = Status.READY;
@@ -187,6 +192,7 @@ public class ElasticSearchSink extends AbstractSink implements Configurable, Bat
       txn.begin();
       int count;
       for (count = 0; count < batchSize; ++count) {
+        //从通道中获取数据
         Event event = channel.take();
 
         if (event == null) {
@@ -209,6 +215,7 @@ public class ElasticSearchSink extends AbstractSink implements Configurable, Bat
         }
 
         sinkCounter.addToEventDrainAttemptCount(count);
+        //将数据写入 es
         client.execute();
       }
       txn.commit();
@@ -273,6 +280,7 @@ public class ElasticSearchSink extends AbstractSink implements Configurable, Bat
           + " must be greater than 0 or not set.");
     }
 
+    //如果配置中设置了client type则使用配置中的client类型
     if (StringUtils.isNotBlank(context.getString(CLIENT_TYPE))) {
       clientType = context.getString(CLIENT_TYPE);
     }

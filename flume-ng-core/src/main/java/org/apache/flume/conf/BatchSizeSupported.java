@@ -26,6 +26,7 @@ public interface BatchSizeSupported {
 
   /**
    * Returns the batch size
+   * 返回批次数量
    */
   long getBatchSize();
 

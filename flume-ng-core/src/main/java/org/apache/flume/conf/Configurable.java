@@ -37,11 +37,11 @@ public interface Configurable {
    * Request the implementing class to (re)configure itself.
    * </p>
    * <p>
-   * When configuration parameters are changed, they must be
-   * reflected by the component asap.
+   * 当配置参数发生改变, 它们必须尽快通过组件反映出来。
    * </p>
    * <p>
    * There are no thread safety guarantees on when configure might be called.
+   * 当调用configure时，是非线程安全的
    * </p>
    * @param context
    */
