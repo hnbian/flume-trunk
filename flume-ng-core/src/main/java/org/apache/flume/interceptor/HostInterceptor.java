@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import static org.apache.flume.interceptor.HostInterceptor.Constants.*;
 
 /**
+ * host 拦截器
  * Simple Interceptor class that sets the host name or IP on all events
  * that are intercepted.<p>
  * The host header is named <code>host</code> and its format is either the FQDN
@@ -97,6 +98,7 @@ public class HostInterceptor implements Interceptor {
 
   /**
    * Modifies events in-place.
+   * 修改header 添加host
    */
   @Override
   public Event intercept(Event event) {
@@ -146,6 +148,7 @@ public class HostInterceptor implements Interceptor {
 
     @Override
     public void configure(Context context) {
+      //从上下文中获取配置
       preserveExisting = context.getBoolean(PRESERVE, PRESERVE_DFLT);
       useIP = context.getBoolean(USE_IP, USE_IP_DFLT);
       header = context.getString(HOST_HEADER, HOST);
@@ -153,6 +156,9 @@ public class HostInterceptor implements Interceptor {
 
   }
 
+  /**
+   * 初始化默认配置
+   */
   public static class Constants {
     public static String HOST = "host";
 

@@ -18,7 +18,12 @@
 
 package org.apache.flume.interceptor;
 
+/**
+ * 拦截器枚举类型
+ * 类型新增加的拦截器需要在这里注册
+ */
 public enum InterceptorType {
+
 
   TIMESTAMP(org.apache.flume.interceptor.TimestampInterceptor.Builder.class),
   HOST(org.apache.flume.interceptor.HostInterceptor.Builder.class),
