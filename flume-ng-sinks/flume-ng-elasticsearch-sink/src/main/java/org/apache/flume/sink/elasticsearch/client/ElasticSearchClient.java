@@ -35,15 +35,19 @@ public interface ElasticSearchClient extends Configurable {
 
   /**
    * Add new event to the bulk
+   * 添加一个新的event 到 bulk
    *
    * @param event
    *    Flume Event
    * @param indexNameBuilder
    *    Index name builder which generates name of index to feed
+   *    索引名称构建器，它生成要提供的索引名称
    * @param indexType
    *    Name of type of document which will be sent to the elasticsearch cluster
+   *    将发送到elasticsearch集群的文档类型的名称
    * @param ttlMs
    *    Time to live expressed in milliseconds. Value <= 0 is ignored
+   *    生存时间以毫秒表示。 值<= 0被忽略
    * @throws Exception
    */
   public void addEvent(Event event, IndexNameBuilder indexNameBuilder,
@@ -51,6 +55,7 @@ public interface ElasticSearchClient extends Configurable {
 
   /**
    * Sends bulk to the elasticsearch cluster
+   * 将bulk写入 elasticsearch cluster
    *
    * @throws Exception
    */
