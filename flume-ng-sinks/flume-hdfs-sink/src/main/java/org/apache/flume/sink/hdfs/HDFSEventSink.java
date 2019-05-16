@@ -59,6 +59,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+/**
+ * HDFS Sink
+ */
 public class HDFSEventSink extends AbstractSink implements Configurable, BatchSizeSupported {
   public interface WriterCallback {
     public void run(String filePath);
@@ -188,6 +191,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable, BatchSi
   }
 
   // read configuration and setup thresholds
+  //获取配置
   @Override
   public void configure(Context context) {
     this.context = context;
@@ -361,6 +365,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable, BatchSi
    * Ensure the file is open. Serialize the data and write it to the file on
    * HDFS. <br/>
    * This method is not thread safe.
+   * 从channel中拉取数据保存到HDFS中，在事务中取出批次量的数据，非线程安全的
    */
   public Status process() throws EventDeliveryException {
     Channel channel = getChannel();
@@ -408,6 +413,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable, BatchSi
         }
 
         // Write the data to HDFS
+        //将数据写入HDFS
         try {
           bucketWriter.append(event);
         } catch (BucketClosedException ex) {
