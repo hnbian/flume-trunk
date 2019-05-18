@@ -78,6 +78,7 @@ import org.apache.flume.util.RoundRobinOrderSelector;
  *
  * @see FailoverSinkProcessor
  * @see LoadBalancingSinkProcessor.SinkSelector
+ * 负载均衡  sink 组
  */
 public class LoadBalancingSinkProcessor extends AbstractSinkProcessor {
   public static final String CONFIG_SELECTOR = "selector";
