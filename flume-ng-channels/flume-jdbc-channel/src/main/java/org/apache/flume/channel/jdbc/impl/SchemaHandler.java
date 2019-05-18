@@ -49,6 +49,7 @@ public interface SchemaHandler {
    * Inserts the given persistent event into the database. The connection that
    * is passed into the handler has an ongoing transaction and therefore the
    * SchemaHandler implementation must not close the connection.
+   * 将给出的事件写到数据库中
    *
    * @param pe the event to persist
    * @param connection the connection to use

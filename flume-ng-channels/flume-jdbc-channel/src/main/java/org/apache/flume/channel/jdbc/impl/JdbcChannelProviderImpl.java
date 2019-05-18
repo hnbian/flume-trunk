@@ -282,6 +282,11 @@ public class JdbcChannelProviderImpl implements JdbcChannelProvider {
     schemaHandler = null;
   }
 
+  /**
+   * 保存event
+   * @param channel
+   * @param event
+   */
   @Override
   public void persistEvent(String channel, Event event) {
     PersistableEvent persistableEvent = new PersistableEvent(channel, event);
@@ -300,6 +305,7 @@ public class JdbcChannelProviderImpl implements JdbcChannelProvider {
       }
 
       // Persist the persistableEvent
+      // 保存
       schemaHandler.storeEvent(persistableEvent, tx.getConnection());
 
       tx.incrementPersistedEventCount();
