@@ -116,6 +116,7 @@ public class HostInterceptor implements Interceptor {
 
   /**
    * Delegates to {@link #intercept(Event)} in a loop.
+   * 循环处理事件
    * @param events
    * @return
    */
